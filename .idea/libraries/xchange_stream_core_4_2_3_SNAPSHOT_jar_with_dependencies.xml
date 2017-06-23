@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="xchange-stream-core-4.2.3-SNAPSHOT-jar-with-dependencies">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../xchange-stream/xchange-stream-core/target/xchange-stream-core-4.2.3-SNAPSHOT-jar-with-dependencies.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
