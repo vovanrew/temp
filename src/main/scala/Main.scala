@@ -1,8 +1,9 @@
-import akka.actor.{ActorSystem, Props}
+import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
-import clients.{BTC_EClient, PoloniexClient}
+import clients.xchange.{BTCEClient, PoloniexClient}
 import org.knowm.xchange.currency.CurrencyPair
-
+import scala.concurrent.duration._
+import org.apache.kafka.common.serialization.StringSerializer
 
 object Main extends App {
 
@@ -11,16 +12,17 @@ object Main extends App {
   implicit val dispatcher = system.dispatcher
 
   val poloniex = system.actorOf(PoloniexClient.props)
-  val btce = system.actorOf(BTC_EClient.props)
+  val btce = system.actorOf(BTCEClient.props)
 
   poloniex ! PoloniexClient.Connect
-  btce ! BTC_EClient.GetConnectionState
+  btce ! BTCEClient.GetConnectionState
 
-  btce ! BTC_EClient.GetTrage(CurrencyPair.BTC_USD)
-  btce ! BTC_EClient.GetOrderBook(CurrencyPair.BTC_USD, 100)
-  btce ! BTC_EClient.GetTicker(CurrencyPair.BTC_USD)
-  
-  poloniex ! PoloniexClient.GetOrderBook(CurrencyPair.BTC_LTC, 100)
+
+  btce ! BTCEClient.GetTrages(CurrencyPair.BTC_USD)
+  system.scheduler.schedule(0 second, 20 second, btce,BTCEClient.GetOrderBook(CurrencyPair.BTC_USD, 5))
+  btce ! BTCEClient.GetTicker(CurrencyPair.BTC_USD)
+
+  system.scheduler.schedule(0 second, 10 second, poloniex, PoloniexClient.GetOrderBook(CurrencyPair.ETH_BTC, 5))
   poloniex ! PoloniexClient.GetTickers(CurrencyPair.LTC_BTC)
   poloniex ! PoloniexClient.GetTrades(CurrencyPair.BTC_LTC)
 }
