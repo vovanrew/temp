@@ -1,10 +1,8 @@
-name := "multiexchange"
+name := "poloniexClient"
 
 version := "1.0"
 
 scalaVersion := "2.12.1"
-
-resolvers += "Local Maven Repository" at "file://"+Path.userHome.absolutePath+"/.m2/repository"
 
 libraryDependencies ++= Seq(
   "com.fasterxml.jackson.core" % "jackson-annotations" % "2.8.0",
@@ -23,6 +21,7 @@ libraryDependencies ++= Seq(
   "com.google.j2objc" % "j2objc-annotations" % "1.1",
   "com.pusher" % "java-websocket" % "1.4.1",
   "com.pusher" % "pusher-java-client" % "1.4.0",
+  "com.typesafe" % "config" % "1.3.1",
   "commons-codec" % "commons-codec" % "1.3",
   "commons-io" % "commons-io" % "2.5",
   "io.netty" % "netty-all" % "4.1.7.Final",
@@ -66,6 +65,3 @@ libraryDependencies ++= Seq(
   "com.typesafe.akka" %% "akka-stream" % "2.5.3",
   "com.typesafe.akka" %% "akka-http" % "10.0.8"
 )
-
-
-updateOptions := updateOptions.value.withLatestSnapshots(false)

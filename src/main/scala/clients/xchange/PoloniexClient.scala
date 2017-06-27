@@ -1,6 +1,11 @@
 package clients.xchange
 
+import java.util.Properties
+
 import akka.actor.{Actor, ActorLogging, Props}
+import clients.kafka.PoloniexKafkaProducer
+import common.InitConfs
+import common.marketdata.{OrderBook, Ticker, Trade}
 import info.bitrich.xchangestream.core.{StreamingExchange, StreamingExchangeFactory, StreamingMarketDataService}
 import info.bitrich.xchangestream.poloniex.PoloniexStreamingExchange
 import org.knowm.xchange.currency.CurrencyPair
@@ -8,6 +13,7 @@ import org.knowm.xchange.poloniex.PoloniexExchange
 import org.knowm.xchange.service.marketdata.MarketDataService
 import org.knowm.xchange.{Exchange, ExchangeFactory}
 
+import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
 object PoloniexClient {
@@ -23,7 +29,7 @@ object PoloniexClient {
   def props: Props = Props(new PoloniexClient)
 }
 
-class PoloniexClient extends Actor with ActorLogging {
+class PoloniexClient extends Actor with ActorLogging with InitConfs {
   import PoloniexClient._
 
   val exchange: Exchange = ExchangeFactory
@@ -40,6 +46,14 @@ class PoloniexClient extends Actor with ActorLogging {
 
   var connectionStatus: Boolean = false
 
+  val props = new Properties()
+  props.put("bootstrap.servers", kafkaHost + ":" + kafkaPort.toString)
+  props.put("acks", "all")
+  props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+  props.put("value.serializer", "common.serialization.MarketDataSerializer")
+
+
+  private val kafkaProducer: PoloniexKafkaProducer = new PoloniexKafkaProducer(props)
 
   override def receive: Receive = {
 
@@ -65,18 +79,35 @@ class PoloniexClient extends Actor with ActorLogging {
 
 
     case GetOrderBook(pair, depth) =>
-      log.info("POLONIX ORDER BOOK: {}\n", marketDataService.getOrderBook(pair, depth.asInstanceOf[Object]))
+      val orderBook = marketDataService.getOrderBook(pair, depth.asInstanceOf[Object])
+      kafkaProducer.send("ORDERBOOK", pair, OrderBook(orderBook.getTimeStamp,
+        orderBook.getAsks.asScala.toList, orderBook.getBids.asScala.toList))
 
 
     case GetTickers(currencyPair) =>
       streamingMarketDataService.getTicker(currencyPair).subscribe(ticker =>
-        log.info("POLONIX TICKER: {}\n", ticker.toString),
+        kafkaProducer.send("TICKER", ticker.getCurrencyPair,
+          Ticker(ticker.getCurrencyPair,
+            ticker.getLast,
+            ticker.getBid,
+            ticker.getAsk,
+            ticker.getHigh,
+            ticker.getLow,
+            ticker.getVwap,
+            ticker.getVolume,
+            ticker.getTimestamp)),
         throwable => log.error("ERROR in getting ticker: ", throwable))
 
 
     case GetTrades(currencyPair) =>
       streamingMarketDataService.getTrades(currencyPair).subscribe(trade =>
-      log.info("POLONIX TRADE: {}\n", trade.getType.toString),
+      kafkaProducer.send("TRADE", trade.getCurrencyPair,
+        Trade(trade.getType,
+          trade.getTradableAmount,
+          trade.getCurrencyPair,
+          trade.getPrice,
+          trade.getTimestamp,
+          trade.getId)),
         throwable => log.error("ERROR in getting trade: ", throwable))
   }
 }

@@ -9,9 +9,9 @@ import MarshallableImplicits._
 
 class MarketDataSerializer extends Serializer[MarketData]{
 
-  override def configure(configs: util.Map[String, _], isKey: Boolean): Unit = ???
+  override def configure(configs: util.Map[String, _], isKey: Boolean): Unit = {}
 
   override def serialize(topic: String, data: MarketData): Array[Byte] = data.toJson.getBytes
 
-  override def close(): Unit = ???
+  override def close(): Unit = {}
 }

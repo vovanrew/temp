@@ -9,9 +9,9 @@ import org.apache.kafka.common.serialization.Deserializer
 
 class MarketDataDeserializer extends Deserializer[MarketData]{
 
-  override def configure(configs: util.Map[String, _], isKey: Boolean): Unit = ???
+  override def configure(configs: util.Map[String, _], isKey: Boolean): Unit = {}
 
-  override def close(): Unit = ???
+  override def close(): Unit = {}
 
-  override def deserialize(topic: String, data: Array[Byte]): MarketData = data.toString.fromJson
+  override def deserialize(topic: String, data: Array[Byte]): MarketData = data.toString.fromJson()
 }
