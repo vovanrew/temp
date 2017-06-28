@@ -2,7 +2,6 @@ import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import clients.xchange.PoloniexClient
 import common.PoloniexCurrencies
-import org.knowm.xchange.currency.CurrencyPair
 
 import scala.concurrent.duration._
 
@@ -15,16 +14,19 @@ object Main extends App {
 
   val poloniex = system.actorOf(PoloniexClient.props)
 
-//  poloniex ! PoloniexClient.Connect
+  poloniex ! PoloniexClient.Connect
 
-  system.scheduler.schedule(0 second, 10 second, poloniex, PoloniexClient.GetOrderBook(PoloniexCurrencies.BTC_USDT, 5))
-//  system.scheduler.schedule(0 second, 10 second, poloniex, PoloniexClient.GetOrderBook(PoloniexCurrencies.BTC_ETH, 5))
-//  system.scheduler.schedule(0 second, 10 second, poloniex, PoloniexClient.GetOrderBook(PoloniexCurrencies.BTC_XMR, 5))
+//  system.scheduler.schedule(0 second, 10 second, poloniex, PoloniexClient.GetOrderBooks(PoloniexCurrencies.BTC_USDT, 5))
+//  system.scheduler.schedule(0 second, 10 second, poloniex, PoloniexClient.GetOrderBooks(PoloniexCurrencies.ETH_BTC, 5))
+//  system.scheduler.schedule(0 second, 10 second, poloniex, PoloniexClient.GetOrderBooks(PoloniexCurrencies.XMR_BTC, 5))
 
-//  poloniex ! PoloniexClient.GetTickers(PoloniexCurrencies.BTC_ETH)
-//  poloniex ! PoloniexClient.GetTickers(PoloniexCurrencies.BTC_XMR)
-//
-//  poloniex ! PoloniexClient.GetTrades(PoloniexCurrencies.BTC_ETH)
-//  poloniex ! PoloniexClient.GetTrades(PoloniexCurrencies.BTC_XMR)
-//
+
+  poloniex ! PoloniexClient.GetTickers(PoloniexCurrencies.BTC_USDT)
+  poloniex ! PoloniexClient.GetTrades(PoloniexCurrencies.USDT_BTC)
+
+  poloniex ! PoloniexClient.GetTickers(PoloniexCurrencies.ETH_BTC)
+  poloniex ! PoloniexClient.GetTrades(PoloniexCurrencies.BTC_ETH)
+
+  poloniex ! PoloniexClient.GetTickers(PoloniexCurrencies.XMR_BTC)
+  poloniex ! PoloniexClient.GetTrades(PoloniexCurrencies.BTC_XMR)
 }
