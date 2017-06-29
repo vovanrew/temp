@@ -13,20 +13,16 @@ object PoloniexCurrencies {
   val BTC_ETH: CurrencyPair = new CurrencyPair(Currency.BTC, Currency.ETH)
   val BTC_XMR: CurrencyPair = new CurrencyPair(Currency.BTC, Currency.XMR)
 
-  def btcFirst(currencyPair: CurrencyPair): String = {
+  def btcFirst(currencyPair: String): String = {
 
-    if(currencyPair.toString.startsWith("BTC")) currencyPair.toString
+    if(currencyPair.startsWith("BTC")) currencyPair
     else {
       val secondCurrency = currencyPair
-        .toString.substring(0, currencyPair.toString.lastIndexOf("_"))
+          .substring(0, currencyPair.lastIndexOf("/"))
 
-      println("\n\n\n\n\n\n\n\n" + currencyPair.toString
-        .substring(currencyPair.toString.lastIndexOf("/" + 1), currencyPair.toString.size)
-        .concat("/"+secondCurrency) + "\n\n\n\n\n")
-
-      currencyPair.toString
-        .substring(currencyPair.toString.lastIndexOf("/" + 1), currencyPair.toString.size)
-        .concat("/"+secondCurrency)
+      currencyPair
+        .substring(currencyPair.lastIndexOf("/") + 1, currencyPair.size)
+        .concat("/" + secondCurrency)
     }
   }
 }

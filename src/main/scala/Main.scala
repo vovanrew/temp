@@ -16,9 +16,9 @@ object Main extends App {
 
   poloniex ! PoloniexClient.Connect
 
-//  system.scheduler.schedule(0 second, 10 second, poloniex, PoloniexClient.GetOrderBooks(PoloniexCurrencies.BTC_USDT, 5))
-//  system.scheduler.schedule(0 second, 10 second, poloniex, PoloniexClient.GetOrderBooks(PoloniexCurrencies.ETH_BTC, 5))
-//  system.scheduler.schedule(0 second, 10 second, poloniex, PoloniexClient.GetOrderBooks(PoloniexCurrencies.XMR_BTC, 5))
+  system.scheduler.schedule(0 second, 10 second, poloniex, PoloniexClient.GetOrderBooks(PoloniexCurrencies.BTC_USDT, 5))
+  system.scheduler.schedule(0 second, 10 second, poloniex, PoloniexClient.GetOrderBooks(PoloniexCurrencies.ETH_BTC, 5))
+  system.scheduler.schedule(0 second, 10 second, poloniex, PoloniexClient.GetOrderBooks(PoloniexCurrencies.XMR_BTC, 5))
 
 
   poloniex ! PoloniexClient.GetTickers(PoloniexCurrencies.BTC_USDT)

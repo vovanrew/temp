@@ -4,6 +4,7 @@ import java.util.Properties
 import java.util.concurrent.Future
 
 import common.InitConfs
+import common.PoloniexCurrencies.btcFirst
 import common.marketdata.MarketData
 import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord, RecordMetadata}
 import org.knowm.xchange.currency.CurrencyPair
@@ -22,9 +23,9 @@ class PoloniexKafkaProducer extends InitConfs {
 
   private val kafkaProducer: KafkaProducer[String, MarketData] = new KafkaProducer[String, MarketData](props)
 
-  def send(dataType: String, curencyPair: CurrencyPair, message: MarketData): Future[RecordMetadata] = {
+  def send(dataType: String, curencyPair: String, message: MarketData): Future[RecordMetadata] = {
     val record: ProducerRecord[String, MarketData] =
-      new ProducerRecord[String, MarketData](topicPrefix + "_" + dataType + "_" + curencyPair.toString.replace("/","-"),
+      new ProducerRecord[String, MarketData](topicPrefix + "_" + dataType + "_" + curencyPair.replace("/","-"),
         0,
         System.currentTimeMillis(),
         dataType.toLowerCase,

@@ -71,11 +71,11 @@ class PoloniexClient extends Actor with ActorLogging with InitConfs {
       sender() ! connectionStatus
 
 
-    case GetOrderBooks(pair, depth) =>
-      val orderBook = marketDataService.getOrderBook(pair, depth.asInstanceOf[Object])
+    case GetOrderBooks(currencyPair, depth) =>
+      val orderBook = marketDataService.getOrderBook(currencyPair, depth.asInstanceOf[Object])
       if(orderBook.getAsks.isEmpty && orderBook.getBids.isEmpty) Unit
       else {
-        kafkaProducer.send("ORDERBOOK", pair, OrderBook(orderBook.getTimeStamp,
+        kafkaProducer.send("ORDERBOOK", btcFirst(currencyPair.toString), OrderBook(orderBook.getTimeStamp,
           orderBook.getAsks.asScala.toList, orderBook.getBids.asScala.toList))
       }
 
@@ -96,23 +96,27 @@ class PoloniexClient extends Actor with ActorLogging with InitConfs {
             value.getTime
         }
 
-        kafkaProducer.send("TICKER", btcFirst(ticker.getCurrencyPair),
+        println("\n\n\n\n\n\n\n\nTICKER:" + btcFirst(currencyPair.toString) + "\n\n\n\n\n\n\n\n")
+
+        kafkaProducer.send("TICKER", btcFirst(ticker.getCurrencyPair.toString),
           Ticker(ticker.getCurrencyPair,
             ticker.getLast,
             ticker.getBid,
             ticker.getAsk,
             ticker.getHigh,
             ticker.getLow,
-            vWap,               //DANGEROUS field had a null value
+            vWap,               //DANGEROUS! field had a null value
             ticker.getVolume,
-            timeStamp))},       //DANGEROUS field had a null value
+            timeStamp))},       //DANGEROUS! field had a null value
         throwable => log.error("\n\n\n\n\nERROR in getting TICKER: ", throwable))
 
 
     case GetTrades(currencyPair) =>
       streamingMarketDataService.getTrades(currencyPair).subscribe(trade => {
 
-        kafkaProducer.send("TRADE", trade.getCurrencyPair,
+        println("\n\n\n\n\n\n\n\nTRADE: " + btcFirst(trade.getCurrencyPair.toString) + "\n\n\n\n\n\n\n\n")
+
+        kafkaProducer.send("TRADE", btcFirst(currencyPair.toString),
         Trade(trade.getType,
           trade.getTradableAmount,
           trade.getCurrencyPair,
